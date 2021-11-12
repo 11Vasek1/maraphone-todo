@@ -1,128 +1,188 @@
-const list = {}
+const list = [];
 
-let amountEveryStatus = { //Просто счетчики количества задач для всех статусов. Необходимо для совпадение с ТЗ(запятые, тире при отсутствии задач и тд)
-    "To Do": 0,
-    "In Progress": 0,
-    "Done": 0,
+const statuses = {
+    todo: "To Do",
+    done: "Done",
+    progress: "In Progress",
 }
 
-function clearAmounts(){//Обнуляет числа в объекте сверху
-    for (const status in amountEveryStatus) {
-        amountEveryStatus[status] = 0;
-    }
+const priorities = {
+    low: "low",
+    high: "high",
 }
 
 //Проверочки
 
-function isCorrectStatus(status){
-    if ( status === "To Do" || status === "In Progress" || status === "Done" ){
-        return true;
-    }else{
-        return false;
+function isCorrectStatus(statusForCheck){
+    let answer = false;
+
+    for (const status in statuses) {
+        const realStatus = statuses[status];
+        answer = answer || (realStatus == statusForCheck);
     }
+
+    return answer;
+}
+
+function isCorrectPriority(priorityForCheck){
+    let answer = false;
+
+    for (const priority in priorities) {
+        const realPriority = priorities[priority];
+        answer = answer || (realPriority == priorityForCheck);
+    }
+
+    return answer;
 }
 
 function isTaskInList(outerTask){
-    let isFinded = false;
-    for (const task in list) {
-        if(task === outerTask){
-            isFinded = true;
+    let answer = false;
+
+    for (const task of list) {
+        const taskName = task.name;
+        answer = answer || (taskName == outerTask);
+    }
+
+    return answer;
+}
+
+
+function getTaskNumberByName(outerTask){
+    let answer = false;
+
+    for (let i = 0; i < list.length; i++) {
+        const taskName = list[i].name;
+        if (taskName === outerTask) {
+            answer = i;
+            return answer;
         }
     }
 
-    return isFinded;
+    console.log('Error, there is no task "'+outerTask+'" in TODO list');
+}
+
+function getTaskByName(outerTask){
+    return list[ getTaskNumberByName(outerTask) ];
+}
+
+let id = 0;
+function getId(){
+    return ++id;
 }
 
 //Функции из ТЗ
 
-function changeStatus(task, status){
+function changeStatus(taskName, status){
     if ( !isCorrectStatus(status) ) {
         console.log('Error: unexpected status "'+status+'"');
-        return false;
+        return;
     }
 
-    if ( !isTaskInList(task) ) {
-        console.log('Error, there is no task "'+task+'" in TODO list');
-        return false;
+    if ( !isTaskInList(taskName) ) {
+        console.log('Error, there is no task "'+taskName+'" in TODO list');
+        return;
     }
 
-    list[task] = status;
+    const task = getTaskByName(taskName);
+    task.status = status;
 }
 
-function addTask(task){
-    list[task] = "To Do";
+function addTask(task, priority = priorities.low, status = statuses.todo){
+    // list[task] = "To Do";
+
+    if ( !isCorrectStatus(status) ) {
+        console.log('Error: unexpected status "'+status+'"');
+        return;
+    }
+
+    if ( !isCorrectPriority(priority) ) {
+        console.log('Error: unexpected priority "'+priority+'"');
+        return;
+    }
+
+
+    list.push({
+        id: getId(),
+        name: task,
+        status: statuses.todo,
+        priority,
+    })
 }
 
-function deleteTask(task){
-    if (isTaskInList(task)) {
-        delete list[task];
-    } else {
-        console.log('Warning, there is no task "'+task+'" in TODO list');
+function deleteTask(taskName){
+
+    if ( !isTaskInList(taskName) ) {
+        console.log('Error, there is no task "'+taskName+'" in TODO list');
+        return;
     }
+
+    const taskNumber = getTaskNumberByName(taskName);
+    list.splice(taskNumber, 1);
 }
 
 // Фукнция showList и его приятели
 
 function showList() {
-    showTasksWithStatus("To Do");
-    showTasksWithStatus("In Progress");
-    showTasksWithStatus("Done");
+    showTasksWithStatus( statuses.todo );
+    showTasksWithStatus( statuses.progress );
+    showTasksWithStatus( statuses.done );
 }
 
 function showTasksWithStatus(status){
-    clearAmounts();
-
     console.log(status);
+    const prefix = '  ';
 
-    //Тут приколдесы, связанные с тире, при отсутствии задач с определенным статусом
+    let isTasksFinded = false;
 
-    for (const task in list) {
-        if(list[task] == status){
-            amountEveryStatus[status]++;
+    for (const task of list) {
+        if(task.status == status){
+            console.log( `${prefix}"${task.name}"` );
         }
     }
 
-    let prefix = '  ';
-
-    if ( amountEveryStatus[status] == 0 ) {
-        console.log( prefix + '-' );
-    }
-
-
-    for (const task in list) {
-        if(list[task] == status){
-            if (amountEveryStatus[status] == 1) {
-                console.log( prefix + '"' + task + '"' ); //За Орду(зачеркнуто) точное следование ТЗ!!!
-            } else {
-                console.log( prefix + '"' + task + '",' );
-            }
-        }
+    if (!isTasksFinded) {
+        console.log( `${prefix}-` );
     }
 }
 
-console.log('----------------------Добавление задач-------------------------');
 
+
+
+
+
+
+
+
+
+function logBeautyfullTitle(title){
+    console.log(`----------------------${title}-------------------------`);
+}
+
+
+logBeautyfullTitle('Добавление задач');
+
+addTask('turn on PC');
 addTask('create a task');
 addTask('write a post');
 addTask('make a bed');
-addTask('turn on PC');
+
 showList();
 
-console.log('----------------------Ошибки при вводе-------------------------');
+logBeautyfullTitle('Ошибки при вводе');
 
 //Проверки на ошибки
 deleteTask('asdasd');
 changeStatus('asd', 'Done');
 changeStatus('make a bed', 'Done!!!');
 
-console.log('----------------------Изменение статусов-------------------------');
+logBeautyfullTitle('Изменение статусов');
 
-changeStatus('write a post', "In Progress");
+// changeStatus('write a post', "In Progress");
 changeStatus('turn on PC', 'Done');
 
 showList();
 
-console.log('----------------------Удаление-------------------------');
+logBeautyfullTitle('Удаление');
 
 deleteTask('turn on PC');
 
