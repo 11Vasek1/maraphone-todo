@@ -1,23 +1,26 @@
 const list = [];
+let id = 0;
 
-const statuses = {
-    todo: "To Do",
-    done: "Done",
-    progress: "In Progress",
+const options = {
+    status: {
+        todo: "To Do",
+        progress: "In Progress",
+        done: "Done",
+    },
+
+    priority: {
+        high: "High",
+        low: "Low",
+    }
 }
 
-const priorities = {
-    low: "low",
-    high: "high",
-}
 
-//Проверочки
 
 function isCorrectStatus(statusForCheck){
     let answer = false;
 
-    for (const status in statuses) {
-        const realStatus = statuses[status];
+    for (const status in options.status) {
+        const realStatus = options.status[status];
         answer = answer || (realStatus == statusForCheck);
     }
 
@@ -27,9 +30,19 @@ function isCorrectStatus(statusForCheck){
 function isCorrectPriority(priorityForCheck){
     let answer = false;
 
-    for (const priority in priorities) {
-        const realPriority = priorities[priority];
+    for (const priority in options.priority) {
+        const realPriority = options.priority[priority];
         answer = answer || (realPriority == priorityForCheck);
+    }
+
+    return answer;
+}
+
+function isCorrectOption(optionForCheck){
+    let answer = false;
+
+    for (const option in options) {
+        answer = answer || (option == optionForCheck);
     }
 
     return answer;
@@ -45,6 +58,7 @@ function isTaskInList(outerTask){
 
     return answer;
 }
+
 
 
 function getTaskNumberByName(outerTask){
@@ -65,12 +79,11 @@ function getTaskByName(outerTask){
     return list[ getTaskNumberByName(outerTask) ];
 }
 
-let id = 0;
 function getId(){
     return ++id;
 }
 
-//Функции из ТЗ
+
 
 function changeStatus(taskName, status){
     if ( !isCorrectStatus(status) ) {
@@ -87,9 +100,7 @@ function changeStatus(taskName, status){
     task.status = status;
 }
 
-function addTask(task, priority = priorities.low, status = statuses.todo){
-    // list[task] = "To Do";
-
+function addTask(task, priority = options.priority.low, status = options.status.todo){
     if ( !isCorrectStatus(status) ) {
         console.log('Error: unexpected status "'+status+'"');
         return;
@@ -104,7 +115,7 @@ function addTask(task, priority = priorities.low, status = statuses.todo){
     list.push({
         id: getId(),
         name: task,
-        status: statuses.todo,
+        status: options.status.todo,
         priority,
     })
 }
@@ -120,22 +131,35 @@ function deleteTask(taskName){
     list.splice(taskNumber, 1);
 }
 
-// Фукнция showList и его приятели
+
 
 function showList() {
-    showTasksWithStatus( statuses.todo );
-    showTasksWithStatus( statuses.progress );
-    showTasksWithStatus( statuses.done );
+    showBy('status');
 }
 
-function showTasksWithStatus(status){
-    console.log(status);
+function showBy(option){
+    if ( !isCorrectOption(option) ) {
+        console.log('Error, there is no option "'+option+'" in TODO list');
+        return;
+    }
+
+    let allOptions = options[option];
+
+    for (const optionValue in allOptions) {
+        showTasksWithOption(option, optionValue);
+    }
+}
+
+function showTasksWithOption(option, optionValue){
+    let optionValueConst = options[option][optionValue];
+
+    console.log(optionValueConst);
     const prefix = '  ';
 
     let isTasksFinded = false;
 
     for (const task of list) {
-        if(task.status == status){
+        if(task[option] == optionValueConst){
             console.log( `${prefix}"${task.name}"` );
         }
     }
@@ -152,9 +176,10 @@ function showTasksWithStatus(status){
 
 
 
-
+//Использование всего этого великолепия
 
 function logBeautyfullTitle(title){
+    console.log('');
     console.log(`----------------------${title}-------------------------`);
 }
 
@@ -162,7 +187,7 @@ function logBeautyfullTitle(title){
 logBeautyfullTitle('Добавление задач');
 
 addTask('turn on PC');
-addTask('create a task');
+addTask('create a task', 'High');
 addTask('write a post');
 addTask('make a bed');
 
@@ -174,6 +199,8 @@ logBeautyfullTitle('Ошибки при вводе');
 deleteTask('asdasd');
 changeStatus('asd', 'Done');
 changeStatus('make a bed', 'Done!!!');
+showBy("priorityasdads")
+
 
 logBeautyfullTitle('Изменение статусов');
 
@@ -187,3 +214,9 @@ logBeautyfullTitle('Удаление');
 deleteTask('turn on PC');
 
 showList();
+
+logBeautyfullTitle('showBy');
+
+showBy("priority");
+
+console.log(list);
