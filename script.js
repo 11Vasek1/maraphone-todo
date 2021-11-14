@@ -1,6 +1,7 @@
 const list = [];
 let id = 0;
 
+
 const STATUS = {
     todo: "To Do",
     progress: "In Progress",
@@ -27,7 +28,7 @@ const options = {
 
 
 function changeStatus(taskName, status){
-    const task = getTaskByName(taskName);
+    const task = list[ getTaskNumberByName(taskName) ]
     task.status = status;
 }
 
@@ -70,8 +71,6 @@ function showTasks(targetOption, title){
         console.log( '    -' );
     }
 }
-
-
 
 function showList() {
     showBy('status');
