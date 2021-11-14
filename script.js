@@ -1,17 +1,28 @@
 const list = [];
 let id = 0;
 
-const options = {
-    status: {
-        todo: "To Do",
-        progress: "In Progress",
-        done: "Done",
-    },
+const STATUS = {
+    todo: "To Do",
+    progress: "In Progress",
+    done: "Done",
+}
 
-    priority: {
-        high: "High",
-        low: "Low",
-    }
+const PRIORITY = {
+    high: "High",
+    low: "Low",
+}
+
+const options = {
+    status: [
+        STATUS.todo,
+        STATUS.progress,
+        STATUS.done,
+    ],
+
+    priority: [
+        PRIORITY.high,
+        PRIORITY.low,
+    ]
 }
 
 
@@ -20,11 +31,11 @@ function changeStatus(taskName, status){
     task.status = status;
 }
 
-function addTask(task, priority = options.priority.low, status = options.status.todo){
+function addTask(task, priority = PRIORITY.low, status = STATUS.todo){
     list.push({
         id: getId(),
         name: task,
-        status: options.status.todo,
+        status,
         priority,
     })
 }
@@ -35,13 +46,32 @@ function deleteTask(taskName){
 }
 
 
-function showBy(option){
-    let allOptions = options[option];
+function showBy( targetOption ){
+    const selectedOptions = options[targetOption];
 
-    for (const optionValue in allOptions) {
-        showTasksWithOption(option, optionValue);
+    selectedOptions.forEach(function(title){
+        showTasks(targetOption, title)
+    })
+}
+
+function showTasks(targetOption, title){
+    console.log(title);
+
+    let isTaskFinded = false;
+
+    list.forEach(function(task){
+        if(task[targetOption] === title){
+            console.log( `    "${task.name}"` );
+            isTaskFinded = true;
+        }
+    })
+
+    if (!isTaskFinded) {
+        console.log( '    -' );
     }
 }
+
+
 
 function showList() {
     showBy('status');
@@ -50,7 +80,7 @@ function showList() {
 
 
 
-//minor functions
+//minor|technical functions
 
 function getTaskNumberByName(taskName){
     let answer = false;
@@ -72,24 +102,7 @@ function getId(){
     return ++id;
 }
 
-function showTasksWithOption(option, optionValue){
-    let optionValueConst = options[option][optionValue];
 
-    console.log(optionValueConst);
-    const prefix = '  ';
-
-    let isTasksFinded = false;
-
-    for (const task of list) {
-        if(task[option] == optionValueConst){
-            console.log( `${prefix}"${task.name}"` );
-        }
-    }
-
-    if (!isTasksFinded) {
-        console.log( `${prefix}-` );
-    }
-}
 
 
 
