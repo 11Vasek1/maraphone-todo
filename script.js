@@ -27,22 +27,22 @@ const options = {
 }
 
 
-function changeStatus(taskName, status){
-    const task = list[ getTaskNumberByName(taskName) ]
+function changeStatus(taskId, status){
+    const task = list[ getTaskNumberById(taskId) ]
     task.status = status;
 }
 
 function addTask(task, priority = PRIORITY.low, status = STATUS.todo){
     list.push({
-        id: getId(),
+        id: createId(),
         name: task,
         status,
         priority,
     })
 }
 
-function deleteTask(taskName){
-    const taskNumber = getTaskNumberByName(taskName);
+function deleteTask(taskId){
+    const taskNumber = getTaskNumberById(taskId);
     list.splice(taskNumber, 1);
 }
 
@@ -81,11 +81,11 @@ function showList() {
 
 //minor|technical functions
 
-function getTaskNumberByName(taskName){
+function getTaskNumberById(taskId){
     let answer = false;
 
     list.forEach(function(task, i){
-        if (task.name === taskName) {
+        if (task.id === taskId) {
             answer = i;
         }
     })
@@ -93,11 +93,7 @@ function getTaskNumberByName(taskName){
     return answer;
 }
 
-function getTaskByName(outerTask){
-    return list[ getTaskNumberByName(outerTask) ];
-}
-
-function getId(){
+function createId(){
     return ++id;
 }
 
@@ -126,18 +122,19 @@ addTask('write a post');
 addTask('make a bed');
 
 showList();
+console.log(list);
 
 
 logBeautyfullTitle('Изменение статусов');
 
-changeStatus('turn on PC', 'Done');
+changeStatus(1, 'Done');
 
 showList();
 
 
 logBeautyfullTitle('Удаление');
 
-deleteTask('turn on PC');
+deleteTask(1);
 
 showList();
 
